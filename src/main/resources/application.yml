@@ -1,0 +1,54 @@
+keycloak:
+  auth-server-url: http://localhost:8080/auth
+  realm: ilex-v3
+  ssl-required: external
+  resource: trade-service
+  bearer-only: true
+  credentials.secret: 814ef3bc-b99b-4585-9250-918912d06a86
+  use-resource-role-mappings: false
+
+  policy-enforcer-config:
+    enforcement-mode: PERMISSIVE
+    paths:
+      - path: /secured/hello
+        methods:
+          - method: GET
+            scopes:
+              - HELLO:VIEW
+      - path: /public/*
+        enforcement-mode: DISABLED
+  security-constraints:
+    - authRoles:
+        - "*"
+      security-collections:
+        - patterns:
+            - /secured/*
+
+
+# Enable all roles, this is important
+#keycloak.securityConstraints[0].authRoles[0]: "*"
+
+# For each url that is protected has to be under securityConstraint
+#keycloak.securityConstraints[0].securityCollections[0].patterns[0]: /secured/*
+
+# For each URL and HTTP method, define the scope that is expected, here the scope(LIST_ROLE)
+# is defined in keycloak client Authorization score
+#keycloak.policy-enforcer-config.paths[0].path: /hello
+#keycloak.policy-enforcer-config.paths[0].methods[0].method: GET
+#keycloak.policy-enforcer-config.paths[0].methods[0].scopes[0]: HELLO:VIEW
+
+#keycloak.policy-enforcer-config.paths[1].path: /merchant/dashboard/summary
+#keycloak.policy-enforcer-config.paths[1].methods[0].method: GET
+#keycloak.policy-enforcer-config.paths[1].methods[0].scopes[0]: VIEW_MERCHANT_DASHBOARD
+
+# For each URL that is not protected we have to explicitly disable the policy
+# enfocer, otherwise it will blocked
+#keycloak.policy-enforcer-config.paths[2].path: /auth/confirmation/email
+#keycloak.policy-enforcer-config.paths[2].enforcement-mode: DISABLED
+
+
+server:
+  port: 5555
+logging:
+  level:
+    org.keycloak.adapters: debug
